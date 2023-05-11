@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-
-import 'incentive_structure_model.dart';
+import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
+import 'package:ethical_export_incentive/models/user_profile_model.dart';
 
 class ApiProvider {
   final dio =
@@ -67,7 +67,39 @@ class ApiProvider {
 
       if (response.statusCode == 200) {
         if (response.data["message"] == "Success") {
-          return IncentiveStructure.fromJson(response.data);
+          return IncentiveStructure.fromJson(
+              response.data['data']['incentive_structures']);
+        }
+
+        throw Exception(
+            "Failed to get response: ${response.data['code']}, ${response.data['status']}");
+      }
+
+      throw Exception('Status Code: ${response.statusCode}');
+    } on DioError catch (_) {
+      throw Exception(_.response?.data);
+    } catch (_) {
+      throw Exception(_);
+    }
+  }
+
+  Future<UserProfile> getUserData({
+    required Map<String, dynamic> tokenHeader,
+    required int userId,
+  }) async {
+    final url = '/$ethService/v1/user/$userId';
+
+    final header = {
+      "Cookie":
+          "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"
+    };
+
+    try {
+      final response = await dio.get(url, options: Options(headers: header));
+
+      if (response.statusCode == 200) {
+        if (response.data["message"] == "Success") {
+          return UserProfile.fromJson(response.data['data']);
         }
 
         throw Exception(

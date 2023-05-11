@@ -23,13 +23,13 @@ class IncentiveStructure {
   final String? roleLabel;
 
   @JsonKey(name: "sales_value_monthly")
-  final int salesValueMonthly;
+  final double salesValueMonthly;
 
   @JsonKey(name: "sales_target_monthly")
-  final int salesTargetMonthly;
+  final double salesTargetMonthly;
 
   @JsonKey(name: "value_incentive_principal")
-  final int valueIncentivePrincipal;
+  final double valueIncentivePrincipal;
 
   final List<IncentiveStructure>? children;
 

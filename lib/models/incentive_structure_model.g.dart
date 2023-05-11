@@ -14,9 +14,10 @@ IncentiveStructure _$IncentiveStructureFromJson(Map<String, dynamic> json) =>
       userId: json['user_id'] as int?,
       roleType: json['role_type'] as String?,
       roleLabel: json['role_label'] as String?,
-      salesValueMonthly: json['sales_value_monthly'] as int,
-      salesTargetMonthly: json['sales_target_monthly'] as int,
-      valueIncentivePrincipal: json['value_incentive_principal'] as int,
+      salesValueMonthly: (json['sales_value_monthly'] as num).toDouble(),
+      salesTargetMonthly: (json['sales_target_monthly'] as num).toDouble(),
+      valueIncentivePrincipal:
+          (json['value_incentive_principal'] as num).toDouble(),
       children: (json['children'] as List<dynamic>?)
           ?.map((e) => IncentiveStructure.fromJson(e as Map<String, dynamic>))
           .toList(),
