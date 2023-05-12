@@ -37,7 +37,7 @@ class ExcelGenerator {
     // Write Worksheet with District Name
     final worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
 
-    worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
+    await worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
 
     await _writeToExcel(worksheet, data);
   }
