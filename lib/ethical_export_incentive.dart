@@ -8,13 +8,24 @@ Future<void> generateExcel(
   final tokenHeader = await provider.login();
 
   final result = await provider.getIncentiveStructureFromBackend(
+    tokenHeader: tokenHeader,
+    salesPeriod: salesPeriod,
+    salesZoneId: salesZoneId,
+    salesZoneType: 'districts',
+  );
+
+  final ExcelGenerator generator = await ExcelGenerator.create(
+    salesPeriod,
+    // getUser: (userId) =>
+    //     provider.getUserData(tokenHeader: tokenHeader, userId: userId),
+    getIncentive: (salesZoneId, salesZoneType) =>
+        provider.getIncentiveStructureFromBackend(
       tokenHeader: tokenHeader,
       salesPeriod: salesPeriod,
-      salesZoneId: salesZoneId);
-
-  final ExcelGenerator generator = await ExcelGenerator.create(salesPeriod,
-      getUser: (userId) =>
-          provider.getUserData(tokenHeader: tokenHeader, userId: userId));
+      salesZoneId: salesZoneId,
+      salesZoneType: salesZoneType,
+    ),
+  );
 
   await generator.compile(result);
 

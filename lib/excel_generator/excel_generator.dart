@@ -1,5 +1,5 @@
+import 'package:ethical_export_incentive/models/incentive_model.dart';
 import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
-import 'package:ethical_export_incentive/models/user_profile_model.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:intl/intl.dart';
 
@@ -10,13 +10,15 @@ class ExcelGenerator {
 
   static Future<ExcelGenerator> create(
     DateTime period, {
-    required Future<UserProfile> Function(int) getUser,
+    // required Future<UserProfile> Function(int) getUser,
+    required Future<IncentiveModel> Function(int, String) getIncentive,
   }) async {
     final provider = ExcelGenerator._create();
 
     provider.sheet = await provider.gSheets.spreadsheet(_insentifSheet);
     provider.period = period;
-    provider.getUser = getUser;
+    // provider.getUser = getUser;
+    provider.getIncentive = getIncentive;
 
     return provider;
   }
@@ -25,14 +27,15 @@ class ExcelGenerator {
   final GSheets gSheets = GSheets(_sheetCredentials);
   late final Spreadsheet sheet;
   late final DateTime period;
-  late final Future<UserProfile> Function(int) getUser;
+  // late final Future<UserProfile> Function(int) getUser;
+  late final Future<IncentiveModel> Function(int, String) getIncentive;
 
   static String get sheetUrl => _sheetUrl;
 
   /* --------------------------------- Methods -------------------------------- */
-  Future<void> compile(IncentiveStructure data) async {
+  Future<void> compile(IncentiveModel data) async {
     // Write Worksheet with District Name
-    final worksheet = await sheet.addWorksheet(data.salesZoneName);
+    final worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
 
     worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
 
@@ -41,29 +44,32 @@ class ExcelGenerator {
 
   Future<void> _writeToExcel(
     Worksheet worksheet,
-    IncentiveStructure data,
+    IncentiveModel data,
   ) async {
-    final UserProfile? user =
-        data.userId != null ? await getUser(data.userId!) : null;
-
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
-      salesZoneId: data.salesZoneId.toString(),
-      salesZoneName: data.salesZoneName,
-      salesZoneType: data.salesZoneType,
-      userName: user?.userName ?? "VACANT",
-      userNip: user?.userNip ?? "VACANT",
-      roleLabel: data.roleLabel ?? "VACANT",
-      salesValueMonthly: data.salesValueMonthly.toString(),
-      salesTargetMonthly: data.salesTargetMonthly.toString(),
-      valueIncentivePrincipal: data.valueIncentivePrincipal.toString(),
+      salesZoneId: data.zone.salesZoneId.toString(),
+      salesZoneName: data.zone.salesZoneName.toString(),
+      salesZoneType: data.zone.salesZoneType.toString(),
+      userName: data.user.userName ?? "VACANT",
+      userNip: data.user.userNip ?? "VACANT",
+      roleLabel: data.user.roleLabel ?? "VACANT",
+      salesValueMonthly: data.structure?.salesValueMonthly.toString() ?? "",
+      salesTargetMonthly: data.structure?.salesTargetMonthly.toString() ?? "",
+      valueIncentivePrincipal:
+          data.accumulation.valueIncentivePrincipal.toString(),
+      achievementPercentage: data.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: data.accumulation.valueIncentiveTotal.toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
 
-    if (data.children != null) {
-      for (IncentiveStructure data in data.children!) {
-        await _writeToExcel(worksheet, data);
+    if (data.structure?.children != null) {
+      for (IncentiveStructure data in data.structure!.children!) {
+        final response =
+            await getIncentive(data.salesZoneId, data.salesZoneType);
+
+        await _writeToExcel(worksheet, response);
       }
     }
   }
@@ -80,6 +86,8 @@ class ExcelSheetRow {
   final String salesValueMonthly;
   final String salesTargetMonthly;
   final String valueIncentivePrincipal;
+  final String achievementPercentage;
+  final String valueIncentiveTotal;
 
   const ExcelSheetRow({
     required this.period,
@@ -92,6 +100,8 @@ class ExcelSheetRow {
     required this.salesValueMonthly,
     required this.salesTargetMonthly,
     required this.valueIncentivePrincipal,
+    required this.achievementPercentage,
+    required this.valueIncentiveTotal,
   });
 
   static List<String> get getColumnTitle => [
@@ -104,7 +114,9 @@ class ExcelSheetRow {
         "Role Name",
         "Sales Bulanan",
         "Target Sales Bulanan",
-        "Insentif"
+        "Insentif Pokok",
+        "Pencapaian (%)",
+        "Insentif Akhir",
       ];
 
   List<String> get getValue => [
@@ -117,6 +129,8 @@ class ExcelSheetRow {
         roleLabel,
         salesValueMonthly,
         salesTargetMonthly,
-        valueIncentivePrincipal
+        valueIncentivePrincipal,
+        achievementPercentage,
+        valueIncentiveTotal,
       ];
 }
