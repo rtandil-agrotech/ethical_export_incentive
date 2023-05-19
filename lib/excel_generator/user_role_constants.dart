@@ -1,0 +1,1 @@
+const roleIdAsm = 6;
