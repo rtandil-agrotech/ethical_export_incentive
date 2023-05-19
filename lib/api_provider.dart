@@ -52,7 +52,6 @@ class ApiProvider {
     final queryParam = {
       "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),
       "sales_zone_id": salesZoneId,
-      // "sales_zone_type": "districts"
       "sales_zone_type": salesZoneType,
     };
 
@@ -81,35 +80,4 @@ class ApiProvider {
       throw Exception(_);
     }
   }
-
-  // Future<UserProfile> getUserData({
-  //   required Map<String, dynamic> tokenHeader,
-  //   required int userId,
-  // }) async {
-  //   final url = '/$ethService/v1/user/$userId';
-
-  //   final header = {
-  //     "Cookie":
-  //         "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"
-  //   };
-
-  //   try {
-  //     final response = await dio.get(url, options: Options(headers: header));
-
-  //     if (response.statusCode == 200) {
-  //       if (response.data["message"] == "Success") {
-  //         return UserProfile.fromJson(response.data['data']);
-  //       }
-
-  //       throw Exception(
-  //           "Failed to get response: ${response.data['code']}, ${response.data['status']}");
-  //     }
-
-  //     throw Exception('Status Code: ${response.statusCode}');
-  //   } on DioError catch (_) {
-  //     throw Exception(_.response?.data);
-  //   } catch (_) {
-  //     throw Exception(_);
-  //   }
-  // }
 }
