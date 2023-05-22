@@ -114,9 +114,6 @@ class ExcelGenerator {
       valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
     );
 
-    print(
-        '${row.salesZoneId} : ${row.salesTargetMonthly} ; ${row.salesValueMonthly}');
-
     await worksheet.values.appendRow(row.getValue);
   }
 }
