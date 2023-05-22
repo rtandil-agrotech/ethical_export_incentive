@@ -1,4 +1,4 @@
-import 'package:ethical_export_incentive/excel_generator/user_role_constants.dart';
+import 'package:ethical_export_incentive/excel_generator/zone_type_constants.dart';
 import 'package:ethical_export_incentive/models/excel_sheet_row.dart';
 import 'package:ethical_export_incentive/models/incentive_model.dart';
 import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
@@ -47,14 +47,16 @@ class ExcelGenerator {
   Future<void> _handleCompile(Worksheet worksheet, IncentiveModel data) async {
     await _writeToExcel(worksheet, data);
 
-    for (IncentiveStructure structure in data.structure!.children!) {
-      final response =
-          await getIncentive(structure.salesZoneId, structure.salesZoneType);
+    if (data.structure != null) {
+      for (IncentiveStructure structure in data.structure!.children!) {
+        final response =
+            await getIncentive(structure.salesZoneId, structure.salesZoneType);
 
-      if (data.user.roleId != roleIdAsm) {
-        await _handleCompile(worksheet, response);
-      } else {
-        await _writeToExcelAsm(worksheet, response, data);
+        if (data.zone.salesZoneType != zoneTypeAsm) {
+          await _handleCompile(worksheet, response);
+        } else {
+          await _writeToExcelAsm(worksheet, response, data);
+        }
       }
     }
   }
@@ -111,6 +113,9 @@ class ExcelGenerator {
           dataFF.accumulation.achievementPercentage.toString(),
       valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
     );
+
+    print(
+        '${row.salesZoneId} : ${row.salesTargetMonthly} ; ${row.salesValueMonthly}');
 
     await worksheet.values.appendRow(row.getValue);
   }
