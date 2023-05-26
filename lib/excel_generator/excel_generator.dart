@@ -37,7 +37,15 @@ class ExcelGenerator {
   /* --------------------------------- Methods -------------------------------- */
   Future<void> compile(IncentiveModel data) async {
     // Write Worksheet with District Name
-    final worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
+    Worksheet worksheet;
+
+    try {
+      worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
+    } catch (e) {
+      final worksheetName = sheet.worksheetByTitle(data.zone.salesZoneName);
+      await sheet.deleteWorksheet(worksheetName!);
+      worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
+    }
 
     await worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
 
@@ -49,8 +57,7 @@ class ExcelGenerator {
 
     if (data.structure != null) {
       for (IncentiveStructure structure in data.structure!.children!) {
-        final response =
-            await getIncentive(structure.salesZoneId, structure.salesZoneType);
+        final response = await getIncentive(structure.salesZoneId, structure.salesZoneType);
 
         if (data.zone.salesZoneType != zoneTypeAsm) {
           await _handleCompile(worksheet, response);
@@ -75,8 +82,7 @@ class ExcelGenerator {
       roleLabel: data.user.roleLabel ?? "VACANT",
       salesValueMonthly: data.structure?.salesValueMonthly.toString() ?? "",
       salesTargetMonthly: data.structure?.salesTargetMonthly.toString() ?? "",
-      valueIncentivePrincipal:
-          data.accumulation.valueIncentivePrincipal.toString(),
+      valueIncentivePrincipal: data.accumulation.valueIncentivePrincipal.toString(),
       achievementPercentage: data.accumulation.achievementPercentage.toString(),
       valueIncentiveTotal: data.accumulation.valueIncentiveTotal.toString(),
     );
@@ -97,20 +103,12 @@ class ExcelGenerator {
       userName: dataFF.user.userName ?? "VACANT",
       userNip: dataFF.user.userNip ?? "VACANT",
       roleLabel: dataFF.user.roleLabel ?? "VACANT",
-      salesValueMonthly: dataASM.structure!.children!
-          .firstWhere(
-              (element) => element.salesZoneId == dataFF.zone.salesZoneId)
-          .salesValueMonthly
-          .toString(),
-      salesTargetMonthly: dataASM.structure!.children!
-          .firstWhere(
-              (element) => element.salesZoneId == dataFF.zone.salesZoneId)
-          .salesTargetMonthly
-          .toString(),
-      valueIncentivePrincipal:
-          dataFF.accumulation.valueIncentivePrincipal.toString(),
-      achievementPercentage:
-          dataFF.accumulation.achievementPercentage.toString(),
+      salesValueMonthly:
+          dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesValueMonthly.toString(),
+      salesTargetMonthly:
+          dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesTargetMonthly.toString(),
+      valueIncentivePrincipal: dataFF.accumulation.valueIncentivePrincipal.toString(),
+      achievementPercentage: dataFF.accumulation.achievementPercentage.toString(),
       valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
     );
 
