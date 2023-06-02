@@ -1,4 +1,3 @@
-import 'package:ethical_export_incentive/excel_generator/zone_type_constants.dart';
 import 'package:ethical_export_incentive/models/excel_sheet_row.dart';
 import 'package:ethical_export_incentive/models/incentive_model.dart';
 import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
