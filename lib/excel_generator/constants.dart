@@ -24,6 +24,5 @@ const _sheetCredentials = r'''
 // const _insentifSheet = '1VCJ_2N3b6wGEcHECA7AjbXUNemuIeaO4fQl3PHEBMGI';
 
 /// COPY
-const _sheetUrl =
-    "https://docs.google.com/spreadsheets/d/1xt2aXjQY2WpdigQLsr2V1FcgsXLWB3Cvd9vgtiC9M_A/edit#gid=0";
+const _sheetUrl = "https://docs.google.com/spreadsheets/d/1xt2aXjQY2WpdigQLsr2V1FcgsXLWB3Cvd9vgtiC9M_A/edit#gid=0";
 const _insentifSheet = '1xt2aXjQY2WpdigQLsr2V1FcgsXLWB3Cvd9vgtiC9M_A';

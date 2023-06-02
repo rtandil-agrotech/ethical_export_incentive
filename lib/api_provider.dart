@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ethical_export_incentive/models/incentive_model.dart';
+import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
 class ApiProvider {
   final dio = Dio(BaseOptions(baseUrl: 'https://staging-api.primaxcelinovasi.co.id'));
@@ -33,15 +34,42 @@ class ApiProvider {
     }
   }
 
+  Future<List<IncentiveIndicator>> getIncentiveIndicator({required Map<String, dynamic> tokenHeader}) async {
+    const url = '/$ethService/v1/incentive/indicator/detail';
+
+    final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+
+    try {
+      final response = await dio.get(url, options: Options(headers: header));
+
+      if (response.statusCode == 200) {
+        if (response.data["message"] == "Success") {
+          return (response.data["data"] as List).map((element) => IncentiveIndicator.fromJson(element)).toList();
+        }
+
+        throw Exception("Failed to get response: ${response.data['code']}, ${response.data['status']}");
+      }
+
+      throw Exception('Status Code: ${response.statusCode}');
+    } on DioError catch (_) {
+      throw Exception(_.response?.data);
+    } catch (_) {
+      throw Exception(_);
+    }
+  }
+
   Future<IncentiveModel> getIncentiveStructureFromBackend(
-      {required Map<String, dynamic> tokenHeader, required DateTime salesPeriod, required int salesZoneId, required String salesZoneType}) async {
+      {required Map<String, dynamic> tokenHeader, required DateTime salesPeriod, int? salesZoneId, String? salesZoneType}) async {
     const url = '/$ethService/v2/incentives';
 
-    final queryParam = {
+    Map<String, dynamic> queryParam = {
       "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),
-      "sales_zone_id": salesZoneId,
-      "sales_zone_type": salesZoneType,
     };
+
+    if (salesZoneId != null && salesZoneType != null) {
+      queryParam['sales_zone_id'] = salesZoneId;
+      queryParam['sales_zone_type'] = salesZoneType;
+    }
 
     final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
 

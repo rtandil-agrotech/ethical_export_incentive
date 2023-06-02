@@ -2,6 +2,8 @@ import 'package:ethical_export_incentive/excel_generator/zone_type_constants.dar
 import 'package:ethical_export_incentive/models/excel_sheet_row.dart';
 import 'package:ethical_export_incentive/models/incentive_model.dart';
 import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
+import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
+import 'package:ethical_export_incentive/models/revision/incentive_indicator_constants.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:intl/intl.dart';
 
@@ -14,6 +16,7 @@ class ExcelGenerator {
     DateTime period, {
     // required Future<UserProfile> Function(int) getUser,
     required Future<IncentiveModel> Function(int, String) getIncentive,
+    required List<IncentiveIndicator> incentiveIndicator,
   }) async {
     final provider = ExcelGenerator._create();
 
@@ -21,6 +24,7 @@ class ExcelGenerator {
     provider.period = period;
     // provider.getUser = getUser;
     provider.getIncentive = getIncentive;
+    provider.incentiveIndicator = incentiveIndicator;
 
     return provider;
   }
@@ -31,75 +35,241 @@ class ExcelGenerator {
   late final DateTime period;
   // late final Future<UserProfile> Function(int) getUser;
   late final Future<IncentiveModel> Function(int, String) getIncentive;
+  late final List<IncentiveIndicator> incentiveIndicator;
 
   static String get sheetUrl => _sheetUrl;
 
   /* --------------------------------- Methods -------------------------------- */
   Future<void> compile(IncentiveModel data) async {
-    // Write Worksheet with District Name
-    Worksheet worksheet;
+    final achievementDivisi = ((data.structure!.salesValueMonthly / data.structure!.salesTargetMonthly) * 100).toInt();
 
-    try {
-      worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
-    } catch (e) {
-      final worksheetName = sheet.worksheetByTitle(data.zone.salesZoneName);
-      await sheet.deleteWorksheet(worksheetName!);
-      worksheet = await sheet.addWorksheet(data.zone.salesZoneName);
-    }
+    for (IncentiveStructure districtData in data.structure!.children!) {
+      final resultNSM = await getIncentive(districtData.salesZoneId, "districts");
 
-    await worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
+      Worksheet worksheet;
 
-    await _handleCompile(worksheet, data);
-  }
+      if (sheet.worksheetByTitle(resultNSM.user.userName!) != null) {
+        await sheet.deleteWorksheet(sheet.worksheetByTitle(resultNSM.user.userName!)!);
+        worksheet = await sheet.addWorksheet(resultNSM.user.userName!);
+        await worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
+      } else {
+        worksheet = await sheet.addWorksheet(resultNSM.user.userName!);
+        await worksheet.values.insertRow(1, ExcelSheetRow.getColumnTitle);
+      }
 
-  Future<void> _handleCompile(Worksheet worksheet, IncentiveModel data) async {
-    await _writeToExcel(worksheet, data);
+      await writeToExcelNSM(worksheet, resultNSM, achievementDivisi);
 
-    if (data.structure != null) {
-      for (IncentiveStructure structure in data.structure!.children!) {
-        final response = await getIncentive(structure.salesZoneId, structure.salesZoneType);
+      for (IncentiveStructure regionData in resultNSM.structure!.children!) {
+        final resultSM = await getIncentive(regionData.salesZoneId, "regions");
 
-        if (data.zone.salesZoneType != zoneTypeAsm) {
-          await _handleCompile(worksheet, response);
-        } else {
-          await _writeToExcelAsm(worksheet, response, data);
+        await writeToExcelSM(worksheet, resultSM, resultNSM, achievementDivisi);
+
+        for (IncentiveStructure areaData in resultSM.structure!.children!) {
+          final resultASM = await getIncentive(areaData.salesZoneId, "areas");
+
+          await writeToExcelASM(worksheet, resultASM, resultSM, resultNSM, achievementDivisi);
+
+          for (IncentiveStructure gtData in resultASM.structure!.children!) {
+            final resultFF = await getIncentive(gtData.salesZoneId, "group_territories");
+
+            await writeToExcelFF(worksheet, resultFF, resultASM, resultSM, resultNSM, achievementDivisi);
+          }
         }
       }
+
+      await Future.delayed(Duration(seconds: 20));
     }
   }
 
-  Future<void> _writeToExcel(
+  Future<void> writeToExcelNSM(
     Worksheet worksheet,
-    IncentiveModel data,
+    IncentiveModel dataNSM,
+    int achievementDivisi,
   ) async {
+    final achievementNSM = dataNSM.accumulation.achievementPercentage;
+
+    final targetIndividu = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorNSMId && achievementNSM >= element.marginBottom && achievementNSM <= element.marginTop)
+        .targetIndividu;
+
+    final targetDivisi = incentiveIndicator
+        .firstWhere(
+          (element) =>
+              element.indicatorHeaderId == incentiveIndicatorNSMId &&
+              achievementDivisi >= element.marginBottom &&
+              achievementDivisi <= element.marginTop,
+        )
+        .targetDivisi;
+
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
-      salesZoneId: data.zone.salesZoneId.toString(),
-      salesZoneName: data.zone.salesZoneName.toString(),
-      salesZoneType: data.zone.salesZoneType.toString(),
-      userName: data.user.userName ?? "VACANT",
-      userNip: data.user.userNip ?? "VACANT",
-      roleLabel: data.user.roleLabel ?? "VACANT",
-      salesValueMonthly: data.structure?.salesValueMonthly.toString() ?? "",
-      salesTargetMonthly: data.structure?.salesTargetMonthly.toString() ?? "",
-      valueIncentivePrincipal: data.accumulation.valueIncentivePrincipal.toString(),
-      achievementPercentage: data.accumulation.achievementPercentage.toString(),
-      targetIndividu: data.accumulation.targetIndividual.toString(),
-      targetAsm: data.accumulation.targetAsm?.toString() ?? "",
-      targetSm: data.accumulation.targetSm?.toString() ?? "",
-      targetNsm: data.accumulation.targetNsm?.toString() ?? "",
-      targetDivisi: data.accumulation.targetDivisi?.toString() ?? "",
-      valueIncentiveTotal: data.accumulation.valueIncentiveTotal.toString(),
+      salesZoneId: dataNSM.zone.salesZoneId.toString(),
+      salesZoneName: dataNSM.zone.salesZoneName.toString(),
+      salesZoneType: dataNSM.zone.salesZoneType.toString(),
+      userName: dataNSM.user.userName ?? "VACANT",
+      userNip: dataNSM.user.userNip ?? "VACANT",
+      roleLabel: dataNSM.user.roleLabel ?? "VACANT",
+      salesValueMonthly: dataNSM.structure!.salesValueMonthly.toString(),
+      salesTargetMonthly: dataNSM.structure!.salesValueMonthly.toString(),
+      valueIncentivePrincipal: dataNSM.accumulation.valueIncentivePrincipal.toString(),
+      targetDivisi: targetDivisi?.toString() ?? "",
+      targetAsm: "",
+      targetSm: "",
+      targetNsm: "",
+      targetIndividu: targetIndividu?.toString() ?? "",
+      achievementPercentage: dataNSM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: (dataNSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetDivisi!).toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
   }
 
-  Future<void> _writeToExcelAsm(
+  Future<void> writeToExcelSM(
+    Worksheet worksheet,
+    IncentiveModel dataSM,
+    IncentiveModel dataNSM,
+    int achievementDivisi,
+  ) async {
+    final achievementSM = dataSM.accumulation.achievementPercentage;
+    final achievementNSM = dataNSM.accumulation.achievementPercentage;
+
+    final targetIndividu = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorSMId && achievementSM >= element.marginBottom && achievementSM <= element.marginTop)
+        .targetIndividu;
+
+    final targetNSM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorSMId && achievementNSM >= element.marginBottom && achievementNSM <= element.marginTop)
+        .targetNsm;
+
+    final targetDivisi = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorSMId &&
+            achievementDivisi >= element.marginBottom &&
+            achievementDivisi <= element.marginTop)
+        .targetDivisi;
+
+    final ExcelSheetRow row = ExcelSheetRow(
+      period: DateFormat("MMMM yyyy", 'id_ID').format(period),
+      salesZoneId: dataSM.zone.salesZoneId.toString(),
+      salesZoneName: dataSM.zone.salesZoneName.toString(),
+      salesZoneType: dataSM.zone.salesZoneType.toString(),
+      userName: dataSM.user.userName ?? "VACANT",
+      userNip: dataSM.user.userNip ?? "VACANT",
+      roleLabel: dataSM.user.roleLabel ?? "VACANT",
+      salesValueMonthly: dataSM.structure!.salesValueMonthly.toString(),
+      salesTargetMonthly: dataSM.structure!.salesValueMonthly.toString(),
+      valueIncentivePrincipal: dataSM.accumulation.valueIncentivePrincipal.toString(),
+      targetDivisi: targetDivisi?.toString() ?? "",
+      targetAsm: "",
+      targetSm: "",
+      targetNsm: targetNSM?.toString() ?? "",
+      targetIndividu: targetIndividu?.toString() ?? "",
+      achievementPercentage: dataSM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: (dataSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetNSM! * targetDivisi!).toString(),
+    );
+
+    await worksheet.values.appendRow(row.getValue);
+  }
+
+  Future<void> writeToExcelASM(
+    Worksheet worksheet,
+    IncentiveModel dataASM,
+    IncentiveModel dataSM,
+    IncentiveModel dataNSM,
+    int achievementDivisi,
+  ) async {
+    final achievementASM = dataASM.accumulation.achievementPercentage;
+    final achievementSM = dataSM.accumulation.achievementPercentage;
+    final achievementNSM = dataNSM.accumulation.achievementPercentage;
+
+    final targetIndividu = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorASMId && achievementASM >= element.marginBottom && achievementASM <= element.marginTop)
+        .targetIndividu;
+
+    final targetSM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorASMId && achievementSM >= element.marginBottom && achievementSM <= element.marginTop)
+        .targetSm;
+
+    final targetNSM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorASMId && achievementNSM >= element.marginBottom && achievementNSM <= element.marginTop)
+        .targetNsm;
+
+    final targetDivisi = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorASMId &&
+            achievementDivisi >= element.marginBottom &&
+            achievementDivisi <= element.marginTop)
+        .targetDivisi;
+
+    final ExcelSheetRow row = ExcelSheetRow(
+      period: DateFormat("MMMM yyyy", 'id_ID').format(period),
+      salesZoneId: dataASM.zone.salesZoneId.toString(),
+      salesZoneName: dataASM.zone.salesZoneName.toString(),
+      salesZoneType: dataASM.zone.salesZoneType.toString(),
+      userName: dataASM.user.userName ?? "VACANT",
+      userNip: dataASM.user.userNip ?? "VACANT",
+      roleLabel: dataASM.user.roleLabel ?? "VACANT",
+      salesValueMonthly: dataASM.structure!.salesValueMonthly.toString(),
+      salesTargetMonthly: dataASM.structure!.salesValueMonthly.toString(),
+      valueIncentivePrincipal: dataASM.accumulation.valueIncentivePrincipal.toString(),
+      targetDivisi: targetDivisi?.toString() ?? "",
+      targetAsm: "",
+      targetSm: targetSM?.toString() ?? "",
+      targetNsm: targetNSM?.toString() ?? "",
+      targetIndividu: targetIndividu?.toString() ?? "",
+      achievementPercentage: dataASM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: (dataASM.accumulation.valueIncentivePrincipal * targetIndividu! * targetSM! * targetNSM! * targetDivisi!).toString(),
+    );
+
+    await worksheet.values.appendRow(row.getValue);
+  }
+
+  Future<void> writeToExcelFF(
     Worksheet worksheet,
     IncentiveModel dataFF,
     IncentiveModel dataASM,
+    IncentiveModel dataSM,
+    IncentiveModel dataNSM,
+    int achievementDivisi,
   ) async {
+    final achievementFF = dataFF.accumulation.achievementPercentage;
+    final achievementASM = dataASM.accumulation.achievementPercentage;
+    final achievementSM = dataSM.accumulation.achievementPercentage;
+    final achievementNSM = dataNSM.accumulation.achievementPercentage;
+
+    final targetIndividu = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorFFId && achievementFF >= element.marginBottom && achievementFF <= element.marginTop)
+        .targetIndividu;
+
+    final targetASM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorFFId && achievementASM >= element.marginBottom && achievementASM <= element.marginTop)
+        .targetAsm;
+
+    final targetSM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorFFId && achievementSM >= element.marginBottom && achievementSM <= element.marginTop)
+        .targetSm;
+
+    final targetNSM = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorFFId && achievementNSM >= element.marginBottom && achievementNSM <= element.marginTop)
+        .targetNsm;
+
+    final targetDivisi = incentiveIndicator
+        .firstWhere((element) =>
+            element.indicatorHeaderId == incentiveIndicatorFFId &&
+            achievementDivisi >= element.marginBottom &&
+            achievementDivisi <= element.marginTop)
+        .targetDivisi;
+
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
       salesZoneId: dataFF.zone.salesZoneId.toString(),
@@ -113,13 +283,14 @@ class ExcelGenerator {
       salesTargetMonthly:
           dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataFF.accumulation.valueIncentivePrincipal.toString(),
+      targetDivisi: targetDivisi?.toString() ?? "",
+      targetAsm: targetASM?.toString() ?? "",
+      targetSm: targetSM?.toString() ?? "",
+      targetNsm: targetNSM?.toString() ?? "",
+      targetIndividu: targetIndividu?.toString() ?? "",
       achievementPercentage: dataFF.accumulation.achievementPercentage.toString(),
-      targetIndividu: dataFF.accumulation.targetIndividual.toString(),
-      targetAsm: dataFF.accumulation.targetAsm?.toString() ?? "",
-      targetSm: dataFF.accumulation.targetSm?.toString() ?? "",
-      targetNsm: dataFF.accumulation.targetNsm?.toString() ?? "",
-      targetDivisi: dataFF.accumulation.targetDivisi?.toString() ?? "",
-      valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
+      valueIncentiveTotal:
+          (dataFF.accumulation.valueIncentivePrincipal * targetIndividu! * targetASM! * targetSM! * targetNSM! * targetDivisi!).toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);

@@ -41,11 +41,11 @@ IncentiveAccumulation _$IncentiveAccumulationFromJson(
     IncentiveAccumulation(
       valueIncentivePrincipal:
           (json['value_incentive_principal'] as num).toDouble(),
-      targetIndividual: (json['target_individual'] as num).toDouble(),
+      targetIndividual: (json['target_individual'] as num?)?.toDouble(),
       targetAsm: (json['target_asm'] as num?)?.toDouble(),
       targetSm: (json['target_sm'] as num?)?.toDouble(),
       targetNsm: (json['target_nsm'] as num?)?.toDouble(),
       targetDivisi: (json['target_divisi'] as num?)?.toDouble(),
-      achievementPercentage: (json['achievement_percentage'] as num).toDouble(),
-      valueIncentiveTotal: (json['value_incentive_total'] as num).toDouble(),
+      achievementPercentage: json['achievement_percentage'] as int,
+      valueIncentiveTotal: (json['value_incentive_total'] as num?)?.toDouble(),
     );

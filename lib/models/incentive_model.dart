@@ -89,10 +89,10 @@ class IncentiveAccumulation {
   final double valueIncentivePrincipal;
 
   @JsonKey(name: 'achievement_percentage')
-  final double achievementPercentage;
+  final int achievementPercentage;
 
   @JsonKey(name: 'target_individual')
-  final double targetIndividual;
+  final double? targetIndividual;
 
   @JsonKey(name: 'target_asm')
   final double? targetAsm;
@@ -107,11 +107,11 @@ class IncentiveAccumulation {
   final double? targetDivisi;
 
   @JsonKey(name: 'value_incentive_total')
-  final double valueIncentiveTotal;
+  final double? valueIncentiveTotal;
 
   const IncentiveAccumulation({
     required this.valueIncentivePrincipal,
-    required this.targetIndividual,
+    this.targetIndividual,
     this.targetAsm,
     this.targetSm,
     this.targetNsm,
