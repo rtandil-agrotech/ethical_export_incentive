@@ -84,6 +84,11 @@ class ExcelGenerator {
       salesTargetMonthly: data.structure?.salesTargetMonthly.toString() ?? "",
       valueIncentivePrincipal: data.accumulation.valueIncentivePrincipal.toString(),
       achievementPercentage: data.accumulation.achievementPercentage.toString(),
+      targetIndividu: data.accumulation.targetIndividual.toString(),
+      targetAsm: data.accumulation.targetAsm?.toString() ?? "",
+      targetSm: data.accumulation.targetSm?.toString() ?? "",
+      targetNsm: data.accumulation.targetNsm?.toString() ?? "",
+      targetDivisi: data.accumulation.targetDivisi?.toString() ?? "",
       valueIncentiveTotal: data.accumulation.valueIncentiveTotal.toString(),
     );
 
@@ -109,6 +114,11 @@ class ExcelGenerator {
           dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataFF.accumulation.valueIncentivePrincipal.toString(),
       achievementPercentage: dataFF.accumulation.achievementPercentage.toString(),
+      targetIndividu: dataFF.accumulation.targetIndividual.toString(),
+      targetAsm: dataFF.accumulation.targetAsm?.toString() ?? "",
+      targetSm: dataFF.accumulation.targetSm?.toString() ?? "",
+      targetNsm: dataFF.accumulation.targetNsm?.toString() ?? "",
+      targetDivisi: dataFF.accumulation.targetDivisi?.toString() ?? "",
       valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
     );
 

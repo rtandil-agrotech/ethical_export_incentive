@@ -24,8 +24,7 @@ class IncentiveModel {
     required this.structure,
   });
 
-  factory IncentiveModel.fromJson(Map<String, dynamic> json) =>
-      _$IncentiveModelFromJson(json);
+  factory IncentiveModel.fromJson(Map<String, dynamic> json) => _$IncentiveModelFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -45,8 +44,7 @@ class IncentiveZone {
     required this.salesZoneName,
   });
 
-  factory IncentiveZone.fromJson(Map<String, dynamic> json) =>
-      _$IncentiveZoneFromJson(json);
+  factory IncentiveZone.fromJson(Map<String, dynamic> json) => _$IncentiveZoneFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -82,8 +80,7 @@ class IncentiveUser {
     this.roleLabel,
   });
 
-  factory IncentiveUser.fromJson(Map<String, dynamic> json) =>
-      _$IncentiveUserFromJson(json);
+  factory IncentiveUser.fromJson(Map<String, dynamic> json) => _$IncentiveUserFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -94,15 +91,34 @@ class IncentiveAccumulation {
   @JsonKey(name: 'achievement_percentage')
   final double achievementPercentage;
 
+  @JsonKey(name: 'target_individual')
+  final double targetIndividual;
+
+  @JsonKey(name: 'target_asm')
+  final double? targetAsm;
+
+  @JsonKey(name: 'target_sm')
+  final double? targetSm;
+
+  @JsonKey(name: 'target_nsm')
+  final double? targetNsm;
+
+  @JsonKey(name: 'target_divisi')
+  final double? targetDivisi;
+
   @JsonKey(name: 'value_incentive_total')
   final double valueIncentiveTotal;
 
   const IncentiveAccumulation({
     required this.valueIncentivePrincipal,
+    required this.targetIndividual,
+    this.targetAsm,
+    this.targetSm,
+    this.targetNsm,
+    this.targetDivisi,
     required this.achievementPercentage,
     required this.valueIncentiveTotal,
   });
 
-  factory IncentiveAccumulation.fromJson(Map<String, dynamic> json) =>
-      _$IncentiveAccumulationFromJson(json);
+  factory IncentiveAccumulation.fromJson(Map<String, dynamic> json) => _$IncentiveAccumulationFromJson(json);
 }

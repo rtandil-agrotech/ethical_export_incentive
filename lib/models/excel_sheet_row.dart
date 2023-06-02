@@ -10,6 +10,11 @@ class ExcelSheetRow {
   final String salesTargetMonthly;
   final String valueIncentivePrincipal;
   final String achievementPercentage;
+  final String targetIndividu;
+  final String targetAsm;
+  final String targetSm;
+  final String targetNsm;
+  final String targetDivisi;
   final String valueIncentiveTotal;
 
   const ExcelSheetRow({
@@ -24,6 +29,11 @@ class ExcelSheetRow {
     required this.salesTargetMonthly,
     required this.valueIncentivePrincipal,
     required this.achievementPercentage,
+    required this.targetIndividu,
+    required this.targetAsm,
+    required this.targetSm,
+    required this.targetNsm,
+    required this.targetDivisi,
     required this.valueIncentiveTotal,
   });
 
@@ -39,6 +49,11 @@ class ExcelSheetRow {
         "Target Sales Bulanan",
         "Insentif Pokok",
         "Pencapaian (%)",
+        "Target Individu",
+        "Target ASM",
+        "Target SM",
+        "Target NSM",
+        "Target Divisi",
         "Insentif Akhir",
       ];
 
@@ -54,6 +69,11 @@ class ExcelSheetRow {
         salesTargetMonthly,
         valueIncentivePrincipal,
         achievementPercentage,
+        targetIndividu,
+        targetAsm,
+        targetSm,
+        targetNsm,
+        targetDivisi,
         valueIncentiveTotal,
       ];
 }
