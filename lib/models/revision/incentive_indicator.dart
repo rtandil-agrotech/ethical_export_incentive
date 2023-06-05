@@ -34,7 +34,9 @@ class IncentiveIndicator {
       targetSm: (json['target_sm'] as num?)?.toDouble(),
       targetNsm: (json['target_nsm'] as num?)?.toDouble(),
       targetDivisi: (json['target_divisi'] as num?)?.toDouble(),
-      marginBottom: (json['margin_bottom_achievement'] as num).toInt(),
+      marginBottom: (json['margin_bottom_achievement'] as num).toInt() == 0
+          ? (json['margin_bottom_achievement'] as num).toInt()
+          : (json['margin_bottom_achievement'] as num).toInt() - 1,
       marginTop: json['margin_top_achievement'] != 0 ? (json['margin_top_achievement'] as num).toInt() : 999,
       periodeStart: DateTime.fromMillisecondsSinceEpoch(json['period_start_time'] * 1000),
       periodeEnd: DateTime.fromMillisecondsSinceEpoch(json['period_end_time'] * 1000),
