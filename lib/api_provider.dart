@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
-import 'package:ethical_export_incentive/models/user_profile_model.dart';
+import 'package:ethical_export_incentive/models/incentive_model.dart';
+import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
 class ApiProvider {
-  final dio =
-      Dio(BaseOptions(baseUrl: 'https://staging-api.primaxcelinovasi.co.id'));
+  final dio = Dio(BaseOptions(baseUrl: 'https://staging-api.primaxcelinovasi.co.id'));
 
   static const authService = 'auth';
   static const ethService = 'ethical';
@@ -22,17 +21,9 @@ class ApiProvider {
 
       final cookieResponse = response.headers["set-cookie"];
 
-      final accessToken = cookieResponse
-          ?.firstWhere((element) => element.split("=").first == "AccessToken")
-          .split(";")
-          .first
-          .split("=")[1];
+      final accessToken = cookieResponse?.firstWhere((element) => element.split("=").first == "AccessToken").split(";").first.split("=")[1];
 
-      final refreshToken = cookieResponse
-          ?.firstWhere((element) => element.split("=").first == "RefreshToken")
-          .split(";")
-          .first
-          .split("=")[1];
+      final refreshToken = cookieResponse?.firstWhere((element) => element.split("=").first == "RefreshToken").split(";").first.split("=")[1];
 
       return {
         'AccessToken': accessToken,
@@ -43,36 +34,20 @@ class ApiProvider {
     }
   }
 
-  Future<IncentiveStructure> getIncentiveStructureFromBackend({
-    required Map<String, dynamic> tokenHeader,
-    required DateTime salesPeriod,
-    required int salesZoneId,
-  }) async {
-    const url = '/$ethService/v2/incentives';
+  Future<List<IncentiveIndicator>> getIncentiveIndicator({required Map<String, dynamic> tokenHeader}) async {
+    const url = '/$ethService/v1/incentive/indicator/detail';
 
-    final queryParam = {
-      "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),
-      "sales_zone_id": salesZoneId,
-      "sales_zone_type": "districts"
-    };
-
-    final header = {
-      "Cookie":
-          "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"
-    };
+    final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
 
     try {
-      final response = await dio.get(url,
-          queryParameters: queryParam, options: Options(headers: header));
+      final response = await dio.get(url, options: Options(headers: header));
 
       if (response.statusCode == 200) {
         if (response.data["message"] == "Success") {
-          return IncentiveStructure.fromJson(
-              response.data['data']['incentive_structures']);
+          return (response.data["data"] as List).map((element) => IncentiveIndicator.fromJson(element)).toList();
         }
 
-        throw Exception(
-            "Failed to get response: ${response.data['code']}, ${response.data['status']}");
+        throw Exception("Failed to get response: ${response.data['code']}, ${response.data['status']}");
       }
 
       throw Exception('Status Code: ${response.statusCode}');
@@ -83,27 +58,30 @@ class ApiProvider {
     }
   }
 
-  Future<UserProfile> getUserData({
-    required Map<String, dynamic> tokenHeader,
-    required int userId,
-  }) async {
-    final url = '/$ethService/v1/user/$userId';
+  Future<IncentiveModel> getIncentiveStructureFromBackend(
+      {required Map<String, dynamic> tokenHeader, required DateTime salesPeriod, int? salesZoneId, String? salesZoneType}) async {
+    const url = '/$ethService/v2/incentives';
 
-    final header = {
-      "Cookie":
-          "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"
+    Map<String, dynamic> queryParam = {
+      "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),
     };
 
+    if (salesZoneId != null && salesZoneType != null) {
+      queryParam['sales_zone_id'] = salesZoneId;
+      queryParam['sales_zone_type'] = salesZoneType;
+    }
+
+    final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+
     try {
-      final response = await dio.get(url, options: Options(headers: header));
+      final response = await dio.get(url, queryParameters: queryParam, options: Options(headers: header));
 
       if (response.statusCode == 200) {
         if (response.data["message"] == "Success") {
-          return UserProfile.fromJson(response.data['data']);
+          return IncentiveModel.fromJson(response.data['data']);
         }
 
-        throw Exception(
-            "Failed to get response: ${response.data['code']}, ${response.data['status']}");
+        throw Exception("Failed to get response: ${response.data['code']}, ${response.data['status']}");
       }
 
       throw Exception('Status Code: ${response.statusCode}');
