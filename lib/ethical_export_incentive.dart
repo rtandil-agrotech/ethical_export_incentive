@@ -2,7 +2,7 @@ import 'package:ethical_export_incentive/api_provider.dart';
 import 'package:ethical_export_incentive/excel_generator/excel_generator.dart';
 import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
-Future<void> generateExcel({required DateTime salesPeriod}) async {
+Future<void> run({required DateTime salesPeriod}) async {
   final provider = ApiProvider();
 
   final tokenHeader = await provider.login();

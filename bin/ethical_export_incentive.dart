@@ -30,5 +30,5 @@ void main(List<String> arguments) async {
 
   print("Loading...");
 
-  await ethical_export_incentive.generateExcel(salesPeriod: DateTime.parse(argResults[salesPeriodArg]));
+  await ethical_export_incentive.run(salesPeriod: DateTime.parse(argResults[salesPeriodArg]));
 }
