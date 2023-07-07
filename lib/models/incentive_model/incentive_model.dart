@@ -1,4 +1,4 @@
-import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
+import 'package:ethical_export_incentive/models/incentive_structure_model/incentive_structure_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'incentive_model.g.dart';

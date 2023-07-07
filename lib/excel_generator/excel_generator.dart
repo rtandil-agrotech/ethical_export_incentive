@@ -1,6 +1,6 @@
 import 'package:ethical_export_incentive/models/excel_sheet_row.dart';
-import 'package:ethical_export_incentive/models/incentive_model.dart';
-import 'package:ethical_export_incentive/models/incentive_structure_model.dart';
+import 'package:ethical_export_incentive/models/incentive_model/incentive_model.dart';
+import 'package:ethical_export_incentive/models/incentive_structure_model/incentive_structure_model.dart';
 import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 import 'package:ethical_export_incentive/models/revision/incentive_indicator_constants.dart';
 import 'package:gsheets/gsheets.dart';

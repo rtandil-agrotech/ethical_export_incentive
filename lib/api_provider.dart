@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:ethical_export_incentive/models/incentive_model.dart';
+import 'package:ethical_export_incentive/models/incentive_model/incentive_model.dart';
 import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
 class ApiProvider {
