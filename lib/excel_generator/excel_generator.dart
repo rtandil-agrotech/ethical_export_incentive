@@ -85,6 +85,8 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
+    final double singleSubordinateMultiplier = dataNSM.structure?.children?.length == 1 ? 0.75 : 1;
+
     final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
 
     final targetIndividu = incentiveIndicator
@@ -118,7 +120,7 @@ class ExcelGenerator {
       targetNsm: "",
       targetIndividu: targetIndividu?.toString() ?? "",
       achievementPercentage: achievementNSM.toString(),
-      valueIncentiveTotal: (dataNSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetDivisi!).toString(),
+      valueIncentiveTotal: (dataNSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetDivisi! * singleSubordinateMultiplier).toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -130,6 +132,8 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
+    final double singleSubordinateMultiplier = dataSM.structure?.children?.length == 1 ? 0.75 : 1;
+
     final achievementSM = dataSM.structure!.salesValueMonthly / dataSM.structure!.salesTargetMonthly * 100;
     final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
 
@@ -165,7 +169,8 @@ class ExcelGenerator {
       targetNsm: targetNSM?.toString() ?? "",
       targetIndividu: targetIndividu?.toString() ?? "",
       achievementPercentage: achievementSM.toString(),
-      valueIncentiveTotal: (dataSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetNSM! * targetDivisi!).toString(),
+      valueIncentiveTotal:
+          (dataSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetNSM! * targetDivisi! * singleSubordinateMultiplier).toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -178,6 +183,8 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
+    final double singleSubordinateMultiplier = dataASM.structure?.children?.length == 1 ? 0.75 : 1;
+
     final achievementASM = dataASM.structure!.salesValueMonthly / dataASM.structure!.salesTargetMonthly * 100;
     final achievementSM = dataSM.structure!.salesValueMonthly / dataSM.structure!.salesTargetMonthly * 100;
     final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
@@ -221,7 +228,9 @@ class ExcelGenerator {
       targetNsm: targetNSM?.toString() ?? "",
       targetIndividu: targetIndividu?.toString() ?? "",
       achievementPercentage: achievementASM.toString(),
-      valueIncentiveTotal: (dataASM.accumulation.valueIncentivePrincipal * targetIndividu! * targetSM! * targetNSM! * targetDivisi!).toString(),
+      valueIncentiveTotal:
+          (dataASM.accumulation.valueIncentivePrincipal * targetIndividu! * targetSM! * targetNSM! * targetDivisi! * singleSubordinateMultiplier)
+              .toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
