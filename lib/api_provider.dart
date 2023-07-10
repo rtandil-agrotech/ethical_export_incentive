@@ -3,7 +3,7 @@ import 'package:ethical_export_incentive/models/incentive_model/incentive_model.
 import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
 class ApiProvider {
-  final dio = Dio(BaseOptions(baseUrl: 'https://staging-api.primaxcelinovasi.co.id'));
+  final dio = Dio(BaseOptions(baseUrl: 'https://api.pharos.co.id'));
 
   static const authService = 'auth';
   static const ethService = 'ethical';
