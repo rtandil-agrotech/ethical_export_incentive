@@ -60,7 +60,7 @@ class ApiProvider {
 
   Future<IncentiveModel> getIncentiveStructureFromBackend(
       {required Map<String, dynamic> tokenHeader, required DateTime salesPeriod, int? salesZoneId, String? salesZoneType}) async {
-    const url = '/$ethService/v2/incentives';
+    const url = '/$ethService/v2/incentives/sales-gt';
 
     Map<String, dynamic> queryParam = {
       "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),

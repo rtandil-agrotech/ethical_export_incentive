@@ -46,6 +46,5 @@ class IncentiveStructure {
     this.children,
   });
 
-  factory IncentiveStructure.fromJson(Map<String, dynamic> json) =>
-      _$IncentiveStructureFromJson(json);
+  factory IncentiveStructure.fromJson(Map<String, dynamic> json) => _$IncentiveStructureFromJson(json);
 }

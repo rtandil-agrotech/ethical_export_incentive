@@ -85,24 +85,6 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
-    final double singleSubordinateMultiplier = dataNSM.structure?.children?.length == 1 ? 0.75 : 1;
-
-    final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
-
-    final targetIndividu = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorNSMId && achievementNSM >= element.marginBottom && achievementNSM < element.marginTop)
-        .targetIndividu;
-
-    final targetDivisi = incentiveIndicator
-        .firstWhere(
-          (element) =>
-              element.indicatorHeaderId == incentiveIndicatorNSMId &&
-              achievementDivisi >= element.marginBottom &&
-              achievementDivisi < element.marginTop,
-        )
-        .targetDivisi;
-
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
       salesZoneId: dataNSM.zone.salesZoneId.toString(),
@@ -114,13 +96,13 @@ class ExcelGenerator {
       salesValueMonthly: dataNSM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataNSM.structure!.salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataNSM.accumulation.valueIncentivePrincipal.toString(),
-      targetDivisi: targetDivisi?.toString() ?? "",
+      targetDivisi: dataNSM.accumulation.targetDivisi?.toString() ?? "",
       targetAsm: "",
       targetSm: "",
       targetNsm: "",
-      targetIndividu: targetIndividu?.toString() ?? "",
-      achievementPercentage: achievementNSM.toString(),
-      valueIncentiveTotal: (dataNSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetDivisi! * singleSubordinateMultiplier).toString(),
+      targetIndividu: dataNSM.accumulation.targetIndividual?.toString() ?? "",
+      achievementPercentage: dataNSM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: dataNSM.accumulation.valueIncentiveTotal.toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -132,26 +114,6 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
-    final double singleSubordinateMultiplier = dataSM.structure?.children?.length == 1 ? 0.75 : 1;
-
-    final achievementSM = dataSM.structure!.salesValueMonthly / dataSM.structure!.salesTargetMonthly * 100;
-    final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
-
-    final targetIndividu = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorSMId && achievementSM >= element.marginBottom && achievementSM < element.marginTop)
-        .targetIndividu;
-
-    final targetNSM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorSMId && achievementNSM >= element.marginBottom && achievementNSM < element.marginTop)
-        .targetNsm;
-
-    final targetDivisi = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorSMId && achievementDivisi >= element.marginBottom && achievementDivisi < element.marginTop)
-        .targetDivisi;
-
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
       salesZoneId: dataSM.zone.salesZoneId.toString(),
@@ -163,14 +125,13 @@ class ExcelGenerator {
       salesValueMonthly: dataSM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataSM.structure!.salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataSM.accumulation.valueIncentivePrincipal.toString(),
-      targetDivisi: targetDivisi?.toString() ?? "",
+      targetDivisi: dataSM.accumulation.targetDivisi?.toString() ?? "",
       targetAsm: "",
       targetSm: "",
-      targetNsm: targetNSM?.toString() ?? "",
-      targetIndividu: targetIndividu?.toString() ?? "",
-      achievementPercentage: achievementSM.toString(),
-      valueIncentiveTotal:
-          (dataSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetNSM! * targetDivisi! * singleSubordinateMultiplier).toString(),
+      targetNsm: dataSM.accumulation.targetNsm?.toString() ?? "",
+      targetIndividu: dataSM.accumulation.targetIndividual?.toString() ?? "",
+      achievementPercentage: dataSM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: dataSM.accumulation.valueIncentiveTotal.toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -183,34 +144,6 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
-    final double singleSubordinateMultiplier = dataASM.structure?.children?.length == 1 ? 0.75 : 1;
-
-    final achievementASM = dataASM.structure!.salesValueMonthly / dataASM.structure!.salesTargetMonthly * 100;
-    final achievementSM = dataSM.structure!.salesValueMonthly / dataSM.structure!.salesTargetMonthly * 100;
-    final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
-
-    final targetIndividu = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorASMId && achievementASM >= element.marginBottom && achievementASM < element.marginTop)
-        .targetIndividu;
-
-    final targetSM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorASMId && achievementSM >= element.marginBottom && achievementSM < element.marginTop)
-        .targetSm;
-
-    final targetNSM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorASMId && achievementNSM >= element.marginBottom && achievementNSM < element.marginTop)
-        .targetNsm;
-
-    final targetDivisi = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorASMId &&
-            achievementDivisi >= element.marginBottom &&
-            achievementDivisi < element.marginTop)
-        .targetDivisi;
-
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
       salesZoneId: dataASM.zone.salesZoneId.toString(),
@@ -222,15 +155,13 @@ class ExcelGenerator {
       salesValueMonthly: dataASM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataASM.structure!.salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataASM.accumulation.valueIncentivePrincipal.toString(),
-      targetDivisi: targetDivisi?.toString() ?? "",
+      targetDivisi: dataASM.accumulation.targetDivisi?.toString() ?? "",
       targetAsm: "",
-      targetSm: targetSM?.toString() ?? "",
-      targetNsm: targetNSM?.toString() ?? "",
-      targetIndividu: targetIndividu?.toString() ?? "",
-      achievementPercentage: achievementASM.toString(),
-      valueIncentiveTotal:
-          (dataASM.accumulation.valueIncentivePrincipal * targetIndividu! * targetSM! * targetNSM! * targetDivisi! * singleSubordinateMultiplier)
-              .toString(),
+      targetSm: dataASM.accumulation.targetSm?.toString() ?? "",
+      targetNsm: dataASM.accumulation.targetNsm?.toString() ?? "",
+      targetIndividu: dataASM.accumulation.targetIndividual?.toString() ?? "",
+      achievementPercentage: dataASM.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: dataASM.accumulation.valueIncentiveTotal.toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -244,38 +175,6 @@ class ExcelGenerator {
     IncentiveModel dataNSM,
     int achievementDivisi,
   ) async {
-    final achievementFF = dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesValueMonthly /
-        dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesTargetMonthly *
-        100;
-    final achievementASM = dataASM.structure!.salesValueMonthly / dataASM.structure!.salesTargetMonthly * 100;
-    final achievementSM = dataSM.structure!.salesValueMonthly / dataSM.structure!.salesTargetMonthly * 100;
-    final achievementNSM = dataNSM.structure!.salesValueMonthly / dataNSM.structure!.salesTargetMonthly * 100;
-
-    final targetIndividu = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorFFId && achievementFF >= element.marginBottom && achievementFF < element.marginTop)
-        .targetIndividu;
-
-    final targetASM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorFFId && achievementASM >= element.marginBottom && achievementASM < element.marginTop)
-        .targetAsm;
-
-    final targetSM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorFFId && achievementSM >= element.marginBottom && achievementSM < element.marginTop)
-        .targetSm;
-
-    final targetNSM = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorFFId && achievementNSM >= element.marginBottom && achievementNSM < element.marginTop)
-        .targetNsm;
-
-    final targetDivisi = incentiveIndicator
-        .firstWhere((element) =>
-            element.indicatorHeaderId == incentiveIndicatorFFId && achievementDivisi >= element.marginBottom && achievementDivisi < element.marginTop)
-        .targetDivisi;
-
     final ExcelSheetRow row = ExcelSheetRow(
       period: DateFormat("MMMM yyyy", 'id_ID').format(period),
       salesZoneId: dataFF.zone.salesZoneId.toString(),
@@ -289,14 +188,13 @@ class ExcelGenerator {
       salesTargetMonthly:
           dataASM.structure!.children!.firstWhere((element) => element.salesZoneId == dataFF.zone.salesZoneId).salesTargetMonthly.toString(),
       valueIncentivePrincipal: dataFF.accumulation.valueIncentivePrincipal.toString(),
-      targetDivisi: targetDivisi?.toString() ?? "",
-      targetAsm: targetASM?.toString() ?? "",
-      targetSm: targetSM?.toString() ?? "",
-      targetNsm: targetNSM?.toString() ?? "",
-      targetIndividu: targetIndividu?.toString() ?? "",
-      achievementPercentage: achievementFF.toString(),
-      valueIncentiveTotal:
-          (dataFF.accumulation.valueIncentivePrincipal * targetIndividu! * targetASM! * targetSM! * targetNSM! * targetDivisi!).toString(),
+      targetDivisi: dataFF.accumulation.targetDivisi?.toString() ?? "",
+      targetAsm: dataFF.accumulation.targetAsm?.toString() ?? "",
+      targetSm: dataFF.accumulation.targetSm?.toString() ?? "",
+      targetNsm: dataFF.accumulation.targetNsm?.toString() ?? "",
+      targetIndividu: dataFF.accumulation.targetIndividual?.toString() ?? "",
+      achievementPercentage: dataFF.accumulation.achievementPercentage.toString(),
+      valueIncentiveTotal: dataFF.accumulation.valueIncentiveTotal.toString(),
     );
 
     await worksheet.values.appendRow(row.getValue);
