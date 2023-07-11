@@ -113,7 +113,7 @@ class ExcelGenerator {
       roleLabel: dataNSM.user.roleLabel ?? "VACANT",
       salesValueMonthly: dataNSM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataNSM.structure!.salesTargetMonthly.toString(),
-      valueIncentivePrincipal: dataNSM.accumulation.valueIncentivePrincipal.toString(),
+      valueIncentivePrincipal: (dataNSM.accumulation.valueIncentivePrincipal * singleSubordinateMultiplier).toString(),
       targetDivisi: targetDivisi?.toString() ?? "",
       targetAsm: "",
       targetSm: "",
@@ -121,6 +121,7 @@ class ExcelGenerator {
       targetIndividu: targetIndividu?.toString() ?? "",
       achievementPercentage: achievementNSM.toString(),
       valueIncentiveTotal: (dataNSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetDivisi! * singleSubordinateMultiplier).toString(),
+      hasSingleSubordinateMultiplier: singleSubordinateMultiplier == 0.75 ? "Pakai pengali" : "",
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -162,7 +163,7 @@ class ExcelGenerator {
       roleLabel: dataSM.user.roleLabel ?? "VACANT",
       salesValueMonthly: dataSM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataSM.structure!.salesTargetMonthly.toString(),
-      valueIncentivePrincipal: dataSM.accumulation.valueIncentivePrincipal.toString(),
+      valueIncentivePrincipal: (dataSM.accumulation.valueIncentivePrincipal * singleSubordinateMultiplier).toString(),
       targetDivisi: targetDivisi?.toString() ?? "",
       targetAsm: "",
       targetSm: "",
@@ -171,6 +172,7 @@ class ExcelGenerator {
       achievementPercentage: achievementSM.toString(),
       valueIncentiveTotal:
           (dataSM.accumulation.valueIncentivePrincipal * targetIndividu! * targetNSM! * targetDivisi! * singleSubordinateMultiplier).toString(),
+      hasSingleSubordinateMultiplier: singleSubordinateMultiplier == 0.75 ? "Pakai pengali" : "",
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -221,7 +223,7 @@ class ExcelGenerator {
       roleLabel: dataASM.user.roleLabel ?? "VACANT",
       salesValueMonthly: dataASM.structure!.salesValueMonthly.toString(),
       salesTargetMonthly: dataASM.structure!.salesTargetMonthly.toString(),
-      valueIncentivePrincipal: dataASM.accumulation.valueIncentivePrincipal.toString(),
+      valueIncentivePrincipal: (dataASM.accumulation.valueIncentivePrincipal * singleSubordinateMultiplier).toString(),
       targetDivisi: targetDivisi?.toString() ?? "",
       targetAsm: "",
       targetSm: targetSM?.toString() ?? "",
@@ -231,6 +233,7 @@ class ExcelGenerator {
       valueIncentiveTotal:
           (dataASM.accumulation.valueIncentivePrincipal * targetIndividu! * targetSM! * targetNSM! * targetDivisi! * singleSubordinateMultiplier)
               .toString(),
+      hasSingleSubordinateMultiplier: singleSubordinateMultiplier == 0.75 ? "Pakai pengali" : "",
     );
 
     await worksheet.values.appendRow(row.getValue);
@@ -297,6 +300,7 @@ class ExcelGenerator {
       achievementPercentage: achievementFF.toString(),
       valueIncentiveTotal:
           (dataFF.accumulation.valueIncentivePrincipal * targetIndividu! * targetASM! * targetSM! * targetNSM! * targetDivisi!).toString(),
+      hasSingleSubordinateMultiplier: "",
     );
 
     await worksheet.values.appendRow(row.getValue);

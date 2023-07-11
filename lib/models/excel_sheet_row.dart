@@ -16,6 +16,7 @@ class ExcelSheetRow {
   final String targetNsm;
   final String targetDivisi;
   final String valueIncentiveTotal;
+  final String hasSingleSubordinateMultiplier;
 
   const ExcelSheetRow({
     required this.period,
@@ -35,6 +36,7 @@ class ExcelSheetRow {
     required this.targetNsm,
     required this.targetDivisi,
     required this.valueIncentiveTotal,
+    required this.hasSingleSubordinateMultiplier,
   });
 
   static List<String> get getColumnTitle => [
@@ -55,6 +57,7 @@ class ExcelSheetRow {
         "Target NSM",
         "Target Divisi",
         "Insentif Akhir",
+        "Pengali 0.75x"
       ];
 
   List<String> get getValue => [
@@ -75,5 +78,6 @@ class ExcelSheetRow {
         targetNsm,
         targetDivisi,
         valueIncentiveTotal,
+        hasSingleSubordinateMultiplier,
       ];
 }
