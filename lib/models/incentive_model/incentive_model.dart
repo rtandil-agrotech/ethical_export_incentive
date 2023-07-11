@@ -89,7 +89,7 @@ class IncentiveAccumulation {
   final double valueIncentivePrincipal;
 
   @JsonKey(name: 'achievement_percentage')
-  final int achievementPercentage;
+  final double achievementPercentage;
 
   @JsonKey(name: 'target_individual')
   final double? targetIndividual;
