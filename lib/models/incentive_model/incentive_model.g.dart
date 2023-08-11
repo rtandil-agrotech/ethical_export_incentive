@@ -46,6 +46,6 @@ IncentiveAccumulation _$IncentiveAccumulationFromJson(
       targetSm: (json['target_sm'] as num?)?.toDouble(),
       targetNsm: (json['target_nsm'] as num?)?.toDouble(),
       targetDivisi: (json['target_divisi'] as num?)?.toDouble(),
-      achievementPercentage: json['achievement_percentage'] as int,
+      achievementPercentage: (json['achievement_percentage'] as num).toDouble(),
       valueIncentiveTotal: (json['value_incentive_total'] as num?)?.toDouble(),
     );

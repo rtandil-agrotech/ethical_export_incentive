@@ -3,41 +3,43 @@ import 'package:ethical_export_incentive/models/incentive_model/incentive_model.
 import 'package:ethical_export_incentive/models/revision/incentive_indicator.dart';
 
 class ApiProvider {
-  final dio = Dio(BaseOptions(baseUrl: 'https://api.pharos.co.id'));
+  final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
 
   static const authService = 'auth';
   static const ethService = 'ethical';
 
   static const loginCredentials = {
-    "email": "ricky.kusuma32@gmail.com",
-    "password": "P130657",
+    "email": "evimirza0201@gmail.com",
+    "password": "P230178",
   };
 
-  Future<Map<String, dynamic>> login() async {
-    const url = '/$authService/v1/authentication/login';
+  // Future<Map<String, dynamic>> login() async {
+  //   const url = '/$authService/v1/authentication/login';
 
-    try {
-      final response = await dio.post(url, data: loginCredentials);
+  //   try {
+  //     final response = await dio.post(url, data: loginCredentials);
 
-      final cookieResponse = response.headers["set-cookie"];
+  //     final cookieResponse = response.headers["set-cookie"];
 
-      final accessToken = cookieResponse?.firstWhere((element) => element.split("=").first == "AccessToken").split(";").first.split("=")[1];
+  //     final accessToken = cookieResponse?.firstWhere((element) => element.split("=").first == "AccessToken").split(";").first.split("=")[1];
 
-      final refreshToken = cookieResponse?.firstWhere((element) => element.split("=").first == "RefreshToken").split(";").first.split("=")[1];
+  //     final refreshToken = cookieResponse?.firstWhere((element) => element.split("=").first == "RefreshToken").split(";").first.split("=")[1];
 
-      return {
-        'AccessToken': accessToken,
-        'RefreshToken': refreshToken,
-      };
-    } catch (_) {
-      throw Exception(_);
-    }
-  }
+  //     return {
+  //       'AccessToken': accessToken,
+  //       'RefreshToken': refreshToken,
+  //     };
+  //   } catch (_) {
+  //     throw Exception(_);
+  //   }
+  // }
 
   Future<List<IncentiveIndicator>> getIncentiveIndicator({required Map<String, dynamic> tokenHeader}) async {
-    const url = '/$ethService/v1/incentive/indicator/detail';
+    // const url = '/$ethService/v1/incentive/indicator/detail';
+    const url = '/v1/incentive/indicator/detail';
 
-    final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+    // final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+    final header = {"Auth-User-Id": 3};
 
     try {
       final response = await dio.get(url, options: Options(headers: header));
@@ -60,7 +62,8 @@ class ApiProvider {
 
   Future<IncentiveModel> getIncentiveStructureFromBackend(
       {required Map<String, dynamic> tokenHeader, required DateTime salesPeriod, int? salesZoneId, String? salesZoneType}) async {
-    const url = '/$ethService/v2/incentives';
+    // const url = '/$ethService/v2/incentives';
+    const url = '/v2/incentives';
 
     Map<String, dynamic> queryParam = {
       "sales_period": (salesPeriod.millisecondsSinceEpoch ~/ 1000),
@@ -71,7 +74,8 @@ class ApiProvider {
       queryParam['sales_zone_type'] = salesZoneType;
     }
 
-    final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+    // final header = {"Cookie": "AccessToken=${tokenHeader['AccessToken']};RefreshToken=${tokenHeader['RefreshToken']}"};
+    final header = {"Auth-User-Id": 3};
 
     try {
       final response = await dio.get(url, queryParameters: queryParam, options: Options(headers: header));

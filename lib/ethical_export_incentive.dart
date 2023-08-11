@@ -5,7 +5,8 @@ import 'package:ethical_export_incentive/models/revision/incentive_indicator.dar
 Future<void> run({required DateTime salesPeriod}) async {
   final provider = ApiProvider();
 
-  final tokenHeader = await provider.login();
+  // final tokenHeader = await provider.login();
+  final tokenHeader = {'Email': '1'};
 
   final List<IncentiveIndicator> incentiveIndicator = await provider.getIncentiveIndicator(tokenHeader: tokenHeader);
 
